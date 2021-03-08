@@ -1,10 +1,10 @@
-package com.igorac.springbootgitpodtemplate;
+package com.igorac.algamoney.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringbootGitpodTemplateApplicationTests {
+class AlgamoneyApiApplicationTests {
 
 	@Test
 	void contextLoads() {

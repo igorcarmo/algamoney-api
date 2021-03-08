@@ -1,13 +1,13 @@
-package com.igorac.springbootgitpodtemplate;
+package com.igorac.algamoney.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringbootGitpodTemplateApplication {
+public class AlgamoneyApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringbootGitpodTemplateApplication.class, args);
+		SpringApplication.run(AlgamoneyApiApplication.class, args);
 	}
 
 }
