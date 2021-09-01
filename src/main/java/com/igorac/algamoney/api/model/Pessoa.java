@@ -26,4 +26,9 @@ public class Pessoa {
     @NotNull
     @Valid
     private Endereco endereco;
+
+    @Transient
+    public Boolean isInativo() {
+        return !this.ativo;
+    }
 }
