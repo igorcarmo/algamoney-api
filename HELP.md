@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.igorac.springboot-gitpod-template' is invalid and this project uses 'com.igorac.springbootgitpodtemplate' instead.
+* The original package name 'dev.igorac.springboot-gitpod-template' is invalid and this project uses 'dev.igorac.springbootgitpodtemplate' instead.
 
 # Getting Started
 

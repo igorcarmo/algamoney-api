@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.igorac.algamoney</groupId>
+    <groupId>dev.igorac.algamoney</groupId>
     <artifactId>algamoney-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>algamoney-api</name>
