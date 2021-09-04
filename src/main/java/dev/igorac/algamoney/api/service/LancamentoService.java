@@ -1,8 +1,10 @@
 package dev.igorac.algamoney.api.service;
 
 import dev.igorac.algamoney.api.core.filter.LancamentoFilter;
+import dev.igorac.algamoney.api.core.objects.CategoriaDto;
 import dev.igorac.algamoney.api.core.objects.LancamentoDto;
 import dev.igorac.algamoney.api.core.objects.PessoaDto;
+import dev.igorac.algamoney.api.exception.CategoriaInexistenteException;
 import dev.igorac.algamoney.api.exception.PessoaInexistenteOuInativaException;
 import dev.igorac.algamoney.api.model.Lancamento;
 import dev.igorac.algamoney.api.model.mapper.LancamentoMapper;
@@ -19,9 +21,11 @@ public class LancamentoService {
     @Autowired
     private LancamentoRepository lancamentoRepository;
     @Autowired
+    private LancamentoMapper lancamentoMapper;
+    @Autowired
     private PessoaService pessoaService;
     @Autowired
-    private LancamentoMapper lancamentoMapper;
+    private CategoriaService categoriaService;
 
     public List<LancamentoDto> listar(LancamentoFilter filter) {
         return lancamentoMapper.entitiesToDtos(lancamentoRepository.filter(filter));
@@ -35,6 +39,13 @@ public class LancamentoService {
         Optional<PessoaDto> pessoa = pessoaService.buscarPeloCodigo(lancamento.getPessoa().getCodigo());
         if (pessoa.isEmpty() || pessoa.get().isInativo()) {
             throw new PessoaInexistenteOuInativaException();
+        }
+
+        if (lancamento.getCategoria() != null && lancamento.getCategoria().getCodigo() != null) {
+            Optional<CategoriaDto> categoria = categoriaService.buscarPeloCodigo(lancamento.getCategoria().getCodigo());
+            if (categoria.isEmpty()) {
+                throw new CategoriaInexistenteException();
+            }
         }
 
         Lancamento lancamentoSalvo = lancamentoMapper.dtoToEntity(lancamento);

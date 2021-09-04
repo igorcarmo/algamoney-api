@@ -68,7 +68,15 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex) {
         String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null, LocaleContextHolder.getLocale());
         String mensagemDev = ex.toString();
-        List<AlgamoneyExceptionHandler.Erro> erros = Collections.singletonList(new AlgamoneyExceptionHandler.Erro(mensagemUsuario, mensagemDev));
+        List<Erro> erros = Collections.singletonList(new Erro(mensagemUsuario, mensagemDev));
+        return ResponseEntity.badRequest().body(erros);
+    }
+
+    @ExceptionHandler({ CategoriaInexistenteException.class })
+    public ResponseEntity<Object> handleCategoriaInexistenteException(CategoriaInexistenteException ex) {
+        String mensagemUsuario = messageSource.getMessage("categoria.inexistente", null, LocaleContextHolder.getLocale());
+        String mensagemDev = ex.toString();
+        List<Erro> erros = Collections.singletonList(new Erro(mensagemUsuario, mensagemDev));
         return ResponseEntity.badRequest().body(erros);
     }
 
