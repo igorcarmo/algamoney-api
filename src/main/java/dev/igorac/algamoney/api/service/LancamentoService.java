@@ -1,5 +1,6 @@
 package dev.igorac.algamoney.api.service;
 
+import dev.igorac.algamoney.api.core.Paging;
 import dev.igorac.algamoney.api.core.filter.LancamentoFilter;
 import dev.igorac.algamoney.api.core.objects.CategoriaDto;
 import dev.igorac.algamoney.api.core.objects.LancamentoDto;
@@ -27,8 +28,8 @@ public class LancamentoService {
     @Autowired
     private CategoriaService categoriaService;
 
-    public List<LancamentoDto> listar(LancamentoFilter filter) {
-        return lancamentoMapper.entitiesToDtos(lancamentoRepository.filter(filter));
+    public List<LancamentoDto> listar(LancamentoFilter filter, Paging page) {
+        return lancamentoMapper.entitiesToDtos(lancamentoRepository.filter(filter, page));
     }
 
     public Optional<LancamentoDto> buscarPeloCodigo(Long codigo) {
@@ -50,5 +51,11 @@ public class LancamentoService {
 
         Lancamento lancamentoSalvo = lancamentoMapper.dtoToEntity(lancamento);
         return lancamentoMapper.entityToDto(lancamentoRepository.save(lancamentoSalvo));
+    }
+
+    public void remover(Long idLancamento) {
+        if (idLancamento == null) throw new IllegalArgumentException("Referência ao lançamento não pode ser nula");
+
+        lancamentoRepository.deleteById(idLancamento);
     }
 }

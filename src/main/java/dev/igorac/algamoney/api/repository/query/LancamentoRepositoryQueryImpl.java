@@ -1,15 +1,16 @@
 package dev.igorac.algamoney.api.repository.query;
 
-import dev.igorac.algamoney.api.model.Lancamento;
+import dev.igorac.algamoney.api.core.Page;
+import dev.igorac.algamoney.api.core.Paging;
 import dev.igorac.algamoney.api.core.filter.LancamentoFilter;
+import dev.igorac.algamoney.api.model.Lancamento;
+import dev.igorac.algamoney.api.repository.util.CriteriaHelper;
+import dev.igorac.algamoney.api.repository.util.CriteriaHelperBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,43 +20,59 @@ public class LancamentoRepositoryQueryImpl
     @PersistenceContext
     private EntityManager entityManager;
 
-    private CriteriaBuilder criteriaBuilder;
-    private CriteriaQuery<Lancamento> criteriaQuery;
-    private Root<Lancamento> root;
-
     @Override
-    public List<Lancamento> filter(LancamentoFilter filter) {
-        build();
-        Predicate[] predicates = createPredicates(filter);
-        criteriaQuery.where(predicates);
+    public Page<Lancamento> filter(LancamentoFilter filter, Paging page) {
+        CriteriaHelper queryHelper = CriteriaHelperBuilder.builder()
+            .withRootClass(Lancamento.class)
+            .withManager(entityManager)
+            .build();
 
-        TypedQuery<Lancamento> query = entityManager.createQuery(criteriaQuery);
-        return query.getResultList();
+        Predicate[] predicates = createPredicates(queryHelper, filter);
+        queryHelper.query().where(predicates);
+
+        TypedQuery<Lancamento> query = entityManager.createQuery(queryHelper.query());
+        query.setFirstResult(page.getFirstResult());
+        query.setMaxResults(page.getSize());
+        return new Page<>(query.getResultList(), page, totalResults(filter));
     }
 
-    private Predicate[] createPredicates(LancamentoFilter filter) {
+    private Long totalResults(LancamentoFilter filter) {
+        CriteriaHelper countHelper = CriteriaHelperBuilder.builder()
+            .withRootClass(Lancamento.class)
+            .withQueryClass(Long.class)
+            .withManager(entityManager)
+            .build();
+
+        Predicate[] predicates = createPredicates(countHelper, filter);
+        countHelper.query().where(predicates);
+
+        countHelper.query().select(countHelper.builder().count(countHelper.root()));
+        return (Long) entityManager.createQuery(countHelper.query()).getSingleResult();
+    }
+
+    private Predicate[] createPredicates(CriteriaHelper helper, LancamentoFilter filter) {
         List<Predicate> predicates = new ArrayList<>();
         if (filter.getDescricao() != null) {
             predicates.add(
-                criteriaBuilder.like(
-                    criteriaBuilder.lower(
-                        root.get("descricao")
+                helper.builder().like(
+                    helper.builder().lower(
+                        helper.root().get("descricao")
                     ),"%"+filter.getDescricao().toLowerCase()+"%"
                 )
             );
         }
         if (filter.getDataVencimentoDe() != null) {
             predicates.add(
-                criteriaBuilder.greaterThanOrEqualTo(
-                    root.get("dataVencimento"),
+                helper.builder().greaterThanOrEqualTo(
+                    helper.root().get("dataVencimento"),
                     filter.getDataVencimentoDe())
             );
 
         }
         if (filter.getDataVencimentoAte() != null) {
             predicates.add(
-                criteriaBuilder.lessThanOrEqualTo(
-                    root.get("dataVencimento"),
+                helper.builder().lessThanOrEqualTo(
+                    helper.root().get("dataVencimento"),
                     filter.getDataVencimentoAte()
                 )
             );
@@ -64,9 +81,4 @@ public class LancamentoRepositoryQueryImpl
         return predicates.toArray(new Predicate[predicates.size()]);
     }
 
-    private void build(){
-        criteriaBuilder = entityManager.getCriteriaBuilder();
-        criteriaQuery = criteriaBuilder.createQuery(Lancamento.class);
-        root = criteriaQuery.from(Lancamento.class);
-    }
 }
